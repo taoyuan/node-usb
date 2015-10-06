@@ -362,7 +362,7 @@ InEndpoint.prototype.pollStop = function (cb) {
 
 InEndpoint.prototype._poll = function (length) {
   var that = this;
-  this._poll_req = this.poll(this.address, this.descriptor.bmAttributes, length, 500, function (err, count, data) {
+  this._poll_req = this.poll(length, 500, function (err, count, data) {
     that._poll_req = null;
     if (err) return that.emit('error', err);
     if (count > 0) that.emit('data', data.slice(0, count));
@@ -371,7 +371,7 @@ InEndpoint.prototype._poll = function (length) {
   });
 };
 
-InEndpoint.prototype.poll = function (endpoint, attributes, length, timeout, cb) {
+InEndpoint.prototype.poll = function (length, timeout, cb) {
   if (!this.poller) {
     this.poller = new usb.Poller(this.device);
   }
@@ -386,7 +386,7 @@ InEndpoint.prototype.poll = function (endpoint, attributes, length, timeout, cb)
   length = length || this.descriptor.wMaxPacketSize;
   timeout = timeout || 500;
   var buffer = new Buffer(length);
-  return this.poller.poll(this.device, this.address, buffer, timeout, function (err, count) {
+  return this.poller.poll(this.address, this.descriptor.bmAttributes, buffer, timeout, function (err, count) {
     if (cb) return cb(err, count, buffer);
     if (err) throw err;
   });
