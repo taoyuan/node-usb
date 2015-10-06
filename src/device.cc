@@ -331,6 +331,23 @@ struct Device_SetInterface: Req{
 	}
 };
 
+
+NAN_METHOD(Device_GetSpeed) {
+	ENTER_METHOD(Device, 0);
+	int r = libusb_get_device_speed(self->device);
+	info.GetReturnValue().Set(Nan::New(r));
+}
+
+NAN_METHOD(Device_SetAutoDetachKernelDrive) {
+	ENTER_METHOD(Device, 1);
+	// should check ?
+//	CHECK_OPEN();
+	int enable;
+	INT_ARG(enable, 0);
+	int r = libusb_set_auto_detach_kernel_driver(self->device_handle, enable);
+	info.GetReturnValue().Set(Nan::New(r == LIBUSB_SUCCESS));
+}
+
 void Device::Init(Local<Object> target){
 	Local<FunctionTemplate> tpl = Nan::New<FunctionTemplate>(deviceConstructor);
 	tpl->SetClassName(Nan::New("Device").ToLocalChecked());
@@ -348,6 +365,9 @@ void Device::Init(Local<Object> target){
 	Nan::SetPrototypeMethod(tpl, "__isKernelDriverActive", IsKernelDriverActive);
 	Nan::SetPrototypeMethod(tpl, "__detachKernelDriver", DetachKernelDriver);
 	Nan::SetPrototypeMethod(tpl, "__attachKernelDriver", AttachKernelDriver);
+
+	Nan::SetPrototypeMethod(tpl, "__getSpeed", Device_GetSpeed);
+	Nan::SetPrototypeMethod(tpl, "__setAutoDetachKernelDrive", Device_SetAutoDetachKernelDrive);
 
 	device_constructor.Reset(tpl);
 	target->Set(Nan::New("Device").ToLocalChecked(), tpl->GetFunction());

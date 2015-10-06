@@ -23,9 +23,15 @@ exports.findByIds = function(vid, pid) {
 			return devices[i]
 		}
 	}
-}
+};
 
-usb.Device.prototype.timeout = 1000
+Object.defineProperty(usb.Device.prototype, "speed", {
+	get: function () {
+		return this._speed || (this._speed = this.__getSpeed());
+	}
+});
+
+usb.Device.prototype.timeout = 1000;
 
 usb.Device.prototype.open = function(){
 	this.__open()
@@ -110,7 +116,7 @@ function(bmRequestType, bRequest, wValue, wIndex, data_or_length, callback){
 		process.nextTick(function() { callback.call(self, e); });
 	}
 	return this;
-}
+};
 
 usb.Device.prototype.getStringDescriptor = function (desc_index, callback) {
 	var langid = 0x0409;
@@ -126,13 +132,18 @@ usb.Device.prototype.getStringDescriptor = function (desc_index, callback) {
 			callback(undefined, buf.toString('utf16le', 2));
 		}
 	);
-}
+};
+
+usb.Device.prototype.setAutoDetachKernelDriver = function (enable) {
+	enable = enable !== false;
+	return this.__setAutoDetachKernelDrive(enable ? 1 : 0);
+};
 
 function Interface(device, id){
-	this.device = device
-	this.id = id
+	this.device = device;
+	this.id = id;
 	this.altSetting = 0;
-	this.__refresh()
+	this.__refresh();
 }
 
 Interface.prototype.__refresh = function(){
