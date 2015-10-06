@@ -139,6 +139,14 @@ usb.Device.prototype.setAutoDetachKernelDriver = function (enable) {
 	return this.__setAutoDetachKernelDrive(enable ? 1 : 0);
 };
 
+usb.Device.prototype.enableAutoDetachKernelDriver = function () {
+	return this.setAutoDetachKernelDriver(true);
+};
+
+usb.Device.prototype.disableAutoDetachKernelDriver = function () {
+	return this.setAutoDetachKernelDriver(false);
+};
+
 function Interface(device, id){
 	this.device = device;
 	this.id = id;
