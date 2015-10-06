@@ -9,8 +9,6 @@ if (usb.INIT_ERROR) {
   throw new Error('Could not initialize libusb. Check that your system has a usb controller.');
 }
 
-var nop = function () {};
-
 Object.keys(events.EventEmitter.prototype).forEach(function (key) {
   exports[key] = events.EventEmitter.prototype[key];
 });
@@ -375,7 +373,7 @@ InEndpoint.prototype._poll = function (length) {
 
 InEndpoint.prototype.poll = function (endpoint, attributes, length, timeout, cb) {
   if (!this.poller) {
-    this.poller = new usb.Poller();
+    this.poller = new usb.Poller(this.device);
   }
   if (typeof length === 'function') {
     cb = length;
