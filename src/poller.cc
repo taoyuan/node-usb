@@ -11,6 +11,8 @@
 #include <usb/ch9.h>
 #endif
 
+Nan::Persistent<FunctionTemplate> Poller::constructor_template;
+
 void __eio_poll(uv_work_t *req) {
   PollBaton *baton = static_cast<PollBaton *>(req->data);
 
