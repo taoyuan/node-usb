@@ -351,7 +351,7 @@ InEndpoint.prototype.pollStart = function (length) {
 };
 
 
-InEndpoint.prototype.pollStop = function () {
+InEndpoint.prototype.pollStop = function (cb) {
   if (!this._poll_active) {
     throw new Error('Polling is not active.');
   }
@@ -359,6 +359,7 @@ InEndpoint.prototype.pollStop = function () {
   if (this._poll_req) {
     this.poller.cancel(this._poll_req);
   }
+  if (cb) cb();
 };
 
 InEndpoint.prototype._poll = function (length) {
