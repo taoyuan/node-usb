@@ -1,5 +1,5 @@
 {
-  "name": "usb",
+  "name": "usbify",
   "description": "Library to access USB devices",
   "keywords": [
     "usb",

@@ -1,7 +1,7 @@
 USB Library for Node.JS
 ===============================
 
-**POSIX:** [![Build Status](https://travis-ci.org/nonolith/node-usb.svg?branch=tcr-usb)](https://travis-ci.org/nonolith/node-usb) &nbsp;&nbsp;&nbsp; **Windows:** [![Build status](https://ci.appveyor.com/api/projects/status/b23kn1pi386nguya/branch/master)](https://ci.appveyor.com/project/kevinmehall/node-usb/branch/master)
+**POSIX:** [![Build Status](https://travis-ci.org/taoyuan/usbify.svg?branch=tcr-usb)](https://travis-ci.org/taoyuan/usbify) &nbsp;&nbsp;&nbsp; **Windows:** [![Build status](https://ci.appveyor.com/api/projects/status/b23kn1pi386nguya/branch/master)](https://ci.appveyor.com/project/kevinmehall/node-usb/branch/master)
 
 Node.JS library for communicating with USB devices in JavaScript / CoffeeScript.
 
@@ -16,7 +16,7 @@ Libusb is included as a submodule. On Linux, you'll need libudev to build libusb
 
 Then, just run
 
-	npm install usb
+	npm install usbify
 
 to install from npm. See the bottom of this page for instructions for building from a git checkout.
 
@@ -27,7 +27,7 @@ Use [Zadig](http://sourceforge.net/projects/libwdi/files/zadig/) to install the 
 API
 ===
 
-	var usb = require('usb')
+	var usb = require('usbify')
 
 usb
 ---
@@ -258,7 +258,7 @@ Development and testing
 
 To build from git:
 
-	git clone --recursive https://github.com/nonolith/node-usb.git
+	git clone --recursive https://github.com/taoyuan/usbify.git
 	cd node-usb
 	npm install
 
