@@ -1,15 +1,7 @@
 
 #include <libusb.h>
-#include "node_usb.h"
-#include <errno.h>
-
-#ifdef __APPLE__
 #include "usb_ch9.h"
-#endif
-
-#ifdef __linux__
-#include <usb/ch9.h>
-#endif
+#include "node_usb.h"
 
 Nan::Persistent<FunctionTemplate> Poller::constructor_template;
 
