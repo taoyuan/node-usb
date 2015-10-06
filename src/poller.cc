@@ -22,13 +22,13 @@ void __eio_poll(uv_work_t *req) {
       break;
     case USB_ENDPOINT_XFER_BULK:
       rc = libusb_bulk_transfer(baton->handle, baton->endpoint, baton->data, baton->length, &baton->result, baton->timeout);
-      if (rc == LIBUSB_SUCCESS)
-        snprintf(baton->error, sizeof(baton->error), "received bulk msg (%d bytes)", baton->result);
+//      if (rc == LIBUSB_SUCCESS)
+//        snprintf(baton->error, sizeof(baton->error), "received bulk msg (%d bytes)", baton->result);
       break;
     case USB_ENDPOINT_XFER_INT:
       rc = libusb_interrupt_transfer(baton->handle, baton->endpoint, baton->data, baton->length, &baton->result, baton->timeout);
-      if (rc == LIBUSB_SUCCESS)
-        snprintf(baton->error, sizeof(baton->error), "received interrupt msg (%d bytes)", baton->result);
+//      if (rc == LIBUSB_SUCCESS)
+//        snprintf(baton->error, sizeof(baton->error), "received interrupt msg (%d bytes)", baton->result);
       break;
     default:;
   }
