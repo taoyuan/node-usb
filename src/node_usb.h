@@ -20,6 +20,8 @@ using namespace node;
 
 #include "helpers.h"
 
+#define ERROR_STRING_SIZE 1024
+
 Local<Value> libusbException(int errorno);
 
 struct DeviceObject {
@@ -65,7 +67,43 @@ struct Transfer: public Nan::ObjectWrap {
 	~Transfer();
 };
 
+struct PollBaton {
+public:
+	libusb_device_handle * handle;
+	unsigned char endpoint;
+	int attributes;
+	unsigned char* data;
+	int offset;
+	int length;
+	unsigned int timeout;
+	Nan::Persistent<Object> buffer;
+	Nan::Callback* callback;
+	int result;
+	char error[ERROR_STRING_SIZE];
+};
 
+class Poller: public Nan::ObjectWrap {
+public:
+	static void Init(Local<Object> exports);
+
+	static NAN_METHOD(New);
+	static NAN_METHOD(Poll);
+	static NAN_METHOD(Cancel);
+
+private:
+
+	Poller();
+	~Poller();
+
+//	int poll(int endpoint, int attributes, char *buffer, int len, Nan::Persistent<Function> callback);
+
+private:
+	Nan::Persistent<v8::Object> This;
+
+	Device* _device;
+
+	static Nan::Persistent<FunctionTemplate> constructor_template;
+};
 
 #define CHECK_USB(r) \
 	if (r < LIBUSB_SUCCESS) { \

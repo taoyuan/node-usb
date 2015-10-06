@@ -83,6 +83,7 @@ extern "C" void Initialize(Local<Object> target) {
 
 	Device::Init(target);
 	Transfer::Init(target);
+	Poller::Init(target);
 
 	Nan::SetMethod(target, "setDebugLevel", SetDebugLevel);
 	Nan::SetMethod(target, "getDeviceList", GetDeviceList);

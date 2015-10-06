@@ -14,6 +14,7 @@
         './src/node_usb.cc',
         './src/device.cc',
         './src/transfer.cc',
+        './src/poller.cc',
       ],
       'cflags_cc': [
         '-std=c++0x'
