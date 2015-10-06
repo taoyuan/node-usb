@@ -17,10 +17,10 @@ Object.keys(events.EventEmitter.prototype).forEach(function (key) {
 
 // convenience method for finding a device by vendor and product id
 exports.findByIds = function (vid, pid) {
-  var devices = usb.getDeviceList()
+  var devices = usb.getDeviceList();
 
   for (var i = 0; i < devices.length; i++) {
-    var deviceDesc = devices[i].deviceDescriptor
+    var deviceDesc = devices[i].deviceDescriptor;
     if ((deviceDesc.idVendor == vid) && (deviceDesc.idProduct == pid)) {
       return devices[i]
     }
@@ -279,9 +279,9 @@ Endpoint.prototype.stopPoll = function (cb) {
   for (var i = 0; i < this.pollTransfers.length; i++) {
     this.pollTransfers[i].cancel()
   }
-  this.pollActive = false
+  this.pollActive = false;
   if (cb) this.once('end', cb);
-}
+};
 
 function InEndpoint(device, descriptor) {
   Endpoint.call(this, device, descriptor)
@@ -345,6 +345,33 @@ InEndpoint.prototype.startPoll = function (nTransfers, transferSize) {
   self.pollPending = this.pollTransfers.length;
 };
 
+InEndpoint.prototype.pollStart = function (length) {
+  this._poll_active = true;
+  this._poll(length);
+};
+
+
+InEndpoint.prototype.pollStop = function () {
+  if (!this._poll_active) {
+    throw new Error('Polling is not active.');
+  }
+  this._poll_active = false;
+  if (this._poll_req) {
+    this.poller.cancel(this._poll_req);
+  }
+};
+
+InEndpoint.prototype._poll = function (length) {
+  var that = this;
+  this._poll_req = this.poll(this.address, this.descriptor.bmAttributes, length, 500, function (err, count, data) {
+    that._poll_req = null;
+    if (err) return that.emit('error', err);
+    if (count > 0) that.emit('data', data.slice(0, count));
+    if (!that.pollActive) return;
+    that._poll(length);
+  });
+};
+
 InEndpoint.prototype.poll = function (endpoint, attributes, length, timeout, cb) {
   if (!this.poller) {
     this.poller = new usb.Poller();
@@ -359,9 +386,11 @@ InEndpoint.prototype.poll = function (endpoint, attributes, length, timeout, cb)
 
   length = length || this.descriptor.wMaxPacketSize;
   timeout = timeout || 500;
-  cb = cb || nop;
   var buffer = new Buffer(length);
-  return this.poller.poll(this.device, this.address, buffer, timeout, cb);
+  return this.poller.poll(this.device, this.address, buffer, timeout, function (err, count) {
+    if (cb) return cb(err, count, buffer);
+    if (err) throw err;
+  });
 };
 
 function OutEndpoint(device, descriptor) {

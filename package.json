@@ -28,7 +28,7 @@
   "engines": {
     "node": ">=0.8.x"
   },
-  "main": "./lib/usbify",
+  "main": "./usbify",
   "repository": {
     "type": "git",
     "url": "https://github.com/nonolith/node-usb.git"
