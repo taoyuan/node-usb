@@ -22,24 +22,23 @@ void __eio_poll(uv_work_t *req) {
       break;
     case USB_ENDPOINT_XFER_BULK:
       rc = libusb_bulk_transfer(baton->handle, baton->endpoint, baton->data, baton->length, &baton->result, baton->timeout);
-      if (rc == LIBUSB_SUCCESS)
+      if (rc == LIBUSB_SUCCESS) {
         DEBUG_LOG("received bulk msg (%d bytes)", baton->result);
+      }
       break;
     case USB_ENDPOINT_XFER_INT:
       rc = libusb_interrupt_transfer(baton->handle, baton->endpoint, baton->data, baton->length, &baton->result, baton->timeout);
-      if (rc == LIBUSB_SUCCESS)
+      if (rc == LIBUSB_SUCCESS) {
         DEBUG_LOG("received interrupt msg (%d bytes)", baton->result);
+      }
       break;
     default:;
   }
   baton->code = rc;
   if (rc != LIBUSB_SUCCESS) {
     baton->result = 0;
-    DEBUG_LOG("Transfer error on EP%02x (xfertype %d): %s",
-             baton->endpoint & 0xFF,
-             unsigned(baton->attributes & USB_ENDPOINT_XFERTYPE_MASK),
-             libusb_strerror((libusb_error) rc)
-    );
+    DEBUG_LOG("Transfer error on EP%02x (xfertype %d): %s", baton->endpoint & 0xFF,
+              unsigned(baton->attributes & USB_ENDPOINT_XFERTYPE_MASK), libusb_strerror((libusb_error) rc));
   }
 }
 
