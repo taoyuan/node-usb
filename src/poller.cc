@@ -14,11 +14,11 @@ void __eio_poll(uv_work_t *req) {
 
   switch (baton->attributes & USB_ENDPOINT_XFERTYPE_MASK) {
     case USB_ENDPOINT_XFER_CONTROL:
-      snprintf(baton->error, sizeof(baton->error), "Can't send on a control endpoint.");
+      DEBUG_LOG("Can't send on a control endpoint.");
       break;
     case USB_ENDPOINT_XFER_ISOC:
       //TODO handle isochronous
-      snprintf(baton->error, sizeof(baton->error), "Isochronous endpoints unhandled.");
+      DEBUG_LOG("Isochronous endpoints unhandled.");
       break;
     case USB_ENDPOINT_XFER_BULK:
       rc = libusb_bulk_transfer(baton->handle, baton->endpoint, baton->data, baton->length, &baton->result, baton->timeout);
@@ -49,7 +49,7 @@ void __eio_poll_done(uv_work_t *req) {
   PollBaton *baton = static_cast<PollBaton *>(req->data);
 
   Local<Value> argv[2];
-  if (baton->error[0]) {
+  if (baton->code != 0) {
     argv[0] = libusbException(baton->code);
     argv[1] = Nan::Undefined();
   } else {
