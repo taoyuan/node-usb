@@ -364,8 +364,11 @@ InEndpoint.prototype._poll = function (length) {
   var that = this;
   this._poll_req = this.poll(length, 500, function (err, count, data) {
     that._poll_req = null;
-    if (err) return that.emit('error', err);
-    if (count > 0) that.emit('data', data.slice(0, count));
+    if (err) {
+      that.emit('error', err);
+    } else if (count > 0) {
+      that.emit('data', data.slice(0, count));
+    }
     if (!that.pollActive) return;
     that._poll(length);
   });

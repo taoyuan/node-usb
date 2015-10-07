@@ -22,20 +22,20 @@ void __eio_poll(uv_work_t *req) {
       break;
     case USB_ENDPOINT_XFER_BULK:
       rc = libusb_bulk_transfer(baton->handle, baton->endpoint, baton->data, baton->length, &baton->result, baton->timeout);
-//      if (rc == LIBUSB_SUCCESS)
-//        snprintf(baton->error, sizeof(baton->error), "received bulk msg (%d bytes)", baton->result);
+      if (rc == LIBUSB_SUCCESS)
+        DEBUG_LOG("received bulk msg (%d bytes)", baton->result);
       break;
     case USB_ENDPOINT_XFER_INT:
       rc = libusb_interrupt_transfer(baton->handle, baton->endpoint, baton->data, baton->length, &baton->result, baton->timeout);
-//      if (rc == LIBUSB_SUCCESS)
-//        snprintf(baton->error, sizeof(baton->error), "received interrupt msg (%d bytes)", baton->result);
+      if (rc == LIBUSB_SUCCESS)
+        DEBUG_LOG("received interrupt msg (%d bytes)", baton->result);
       break;
     default:;
   }
+  baton->code = rc;
   if (rc != LIBUSB_SUCCESS) {
     baton->result = 0;
-    snprintf(baton->error, sizeof(baton->error),
-             "Transfer error on EP%02x (xfertype %d): %s",
+    DEBUG_LOG("Transfer error on EP%02x (xfertype %d): %s",
              baton->endpoint & 0xFF,
              unsigned(baton->attributes & USB_ENDPOINT_XFERTYPE_MASK),
              libusb_strerror((libusb_error) rc)
@@ -50,7 +50,7 @@ void __eio_poll_done(uv_work_t *req) {
 
   Local<Value> argv[2];
   if (baton->error[0]) {
-    argv[0] = Nan::Error(baton->error);
+    argv[0] = libusbException(baton->code);
     argv[1] = Nan::Undefined();
   } else {
     argv[0] = Nan::Undefined();

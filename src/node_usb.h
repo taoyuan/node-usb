@@ -20,8 +20,6 @@ using namespace node;
 
 #include "helpers.h"
 
-#define ERROR_STRING_SIZE 1024
-
 Local<Value> libusbException(int errorno);
 
 struct DeviceObject {
@@ -79,7 +77,7 @@ public:
 	Nan::Persistent<Object> buffer;
 	Nan::Callback* callback;
 	int result;
-	char error[ERROR_STRING_SIZE];
+	int code;
 };
 
 class Poller: public Nan::ObjectWrap {
