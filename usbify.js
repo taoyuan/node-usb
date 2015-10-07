@@ -343,56 +343,53 @@ InEndpoint.prototype.startPoll = function (nTransfers, transferSize) {
   self.pollPending = this.pollTransfers.length;
 };
 
-InEndpoint.prototype.pollStart = function (length) {
-  this._poll_active = true;
-  this._poll(length);
+InEndpoint.prototype.pollStart = function (size, timeout) {
+  if (this._pollActive) return false;
+
+  var that = this;
+  size = size || this.descriptor.wMaxPacketSize;
+  timeout = timeout || 500;
+
+  this._pollActive = true;
+  var poller = this.poller = new usb.Poller(this.device, this.address, this.descriptor.bmAttributes, timeout, done);
+
+  function done(err, buf, count) {
+    if (err) {
+      that.emit('error', err);
+      that.pollStop();
+    } else {
+      that.emit("data", buf.slice(0, count))
+    }
+
+    if (that._pollActive) {
+      poll();
+    } else {
+      that.emit('end');
+    }
+  }
+
+  function poll() {
+    try {
+      poller.poll(new Buffer(size));
+    } catch (e) {
+      that.emit("error", e);
+      that.stopPoll();
+    }
+  }
+
+  poll();
+
+  return true;
 };
 
 
 InEndpoint.prototype.pollStop = function (cb) {
-  if (!this._poll_active) {
+  if (!this._pollActive) {
     throw new Error('Polling is not active.');
   }
-  this._poll_active = false;
-  if (this._poll_req) {
-    this.poller.cancel(this._poll_req);
-  }
+  this._pollActive = false;
+  this.poller.cancel();
   if (cb) cb();
-};
-
-InEndpoint.prototype._poll = function (length) {
-  var that = this;
-  this._poll_req = this.poll(length, 500, function (err, count, data) {
-    that._poll_req = null;
-    if (err && err.errno != usb.LIBUSB_ERROR_TIMEOUT) {
-      that.emit('error', err);
-    } else if (count > 0) {
-      that.emit('data', data.slice(0, count));
-    }
-    if (!that.pollActive) return;
-    that._poll(length);
-  });
-};
-
-InEndpoint.prototype.poll = function (length, timeout, cb) {
-  if (!this.poller) {
-    this.poller = new usb.Poller(this.device);
-  }
-  if (typeof length === 'function') {
-    cb = length;
-    length = null;
-  } else if (typeof timeout === 'function') {
-    cb = timeout;
-    timeout = null;
-  }
-
-  length = length || this.descriptor.wMaxPacketSize;
-  timeout = timeout || 500;
-  var buffer = new Buffer(length);
-  return this.poller.poll(this.address, this.descriptor.bmAttributes, buffer, timeout, function (err, count) {
-    if (cb) return cb(err, count, buffer);
-    if (err) throw err;
-  });
 };
 
 function OutEndpoint(device, descriptor) {
