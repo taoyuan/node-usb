@@ -108,7 +108,7 @@ usb.Device.prototype.controlTransfer =
           }
         }
       }
-    )
+    );
 
     try {
       transfer.submit(buf)
@@ -364,7 +364,7 @@ InEndpoint.prototype._poll = function (length) {
   var that = this;
   this._poll_req = this.poll(length, 500, function (err, count, data) {
     that._poll_req = null;
-    if (err) {
+    if (err && err.errno != usb.LIBUSB_ERROR_TIMEOUT) {
       that.emit('error', err);
     } else if (count > 0) {
       that.emit('data', data.slice(0, count));
