@@ -172,16 +172,16 @@ function Interface(device, id) {
 }
 
 Interface.prototype.__refresh = function () {
-  this.descriptor = this.device.configDescriptor.interfaces[this.id][this.altSetting]
-  this.interfaceNumber = this.descriptor.bInterfaceNumber
-  this.endpoints = []
-  var len = this.descriptor.endpoints.length
+  this.descriptor = this.device.configDescriptor.interfaces[this.id][this.altSetting];
+  this.interfaceNumber = this.descriptor.bInterfaceNumber;
+  this.endpoints = [];
+  var len = this.descriptor.endpoints.length;
   for (var i = 0; i < len; i++) {
-    var desc = this.descriptor.endpoints[i]
-    var c = (desc.bEndpointAddress & usb.LIBUSB_ENDPOINT_IN) ? InEndpoint : OutEndpoint
-    this.endpoints[i] = new c(this.device, desc)
+    var desc = this.descriptor.endpoints[i];
+    var c = (desc.bEndpointAddress & usb.LIBUSB_ENDPOINT_IN) ? InEndpoint : OutEndpoint;
+    this.endpoints[i] = new c(this.device, desc);
   }
-}
+};
 
 Interface.prototype.claim = function () {
   this.device.__claimInterface(this.id)
@@ -290,7 +290,11 @@ Endpoint.prototype.stopPoll = function (cb) {
     throw new Error('Polling is not active.');
   }
   for (var i = 0; i < this.pollTransfers.length; i++) {
-    this.pollTransfers[i].cancel()
+    try {
+      this.pollTransfers[i].cancel();
+    } catch (err) {
+      this.emit('error', err);
+    }
   }
   this.pollActive = false;
   if (cb) this.once('end', cb);
