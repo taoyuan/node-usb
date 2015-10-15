@@ -27,35 +27,22 @@ Device::~Device(){
 	libusb_unref_device(device);
 }
 
-// Map pinning each libusb_device to a particular V8 instance
-std::map<libusb_device*, DeviceObject*> Device::byPtr;
-
-void DeviceWeakCallback(const Nan::WeakCallbackInfo<libusb_device> &data)  {
-	Device::unpin(data.GetParameter());
-}
+// Map each libusb_device to a particular V8 instance
+StdPersistentValueMap<libusb_device*, v8::Object> Device::byPtr(Isolate::GetCurrent());
 
 // Get a V8 instance for a libusb_device: either the existing one from the map,
 // or create a new one and add it to the map.
 Local<Object> Device::get(libusb_device* dev){
-	auto it = byPtr.find(dev);
-	if (it != byPtr.end()){
-		return Nan::New(it->second->obj);
+	Local<Object> it = byPtr.Get(dev);
+	if (!it.IsEmpty()) {
+		return it;
 	} else {
 		Local<FunctionTemplate> constructorHandle = Nan::New<v8::FunctionTemplate>(device_constructor);
 		Local<Value> argv[1] = { EXTERNAL_NEW(new Device(dev)) };
 		Local<Object> obj = constructorHandle->GetFunction()->NewInstance(1, argv);
-		Nan::Persistent<Object> p(obj);
-		DeviceObject* dd = new DeviceObject;
-		dd->obj.Reset(p);
-		p.SetWeak(dev, DeviceWeakCallback, Nan::WeakCallbackType::kParameter);
-		byPtr.insert(std::make_pair(dev, dd));
+		byPtr.Set(dev, obj);
 		return obj;
 	}
-}
-
-void Device::unpin(libusb_device* device) {
-	byPtr.erase(device);
-	DEBUG_LOG("Removed cached device %p", device);
 }
 
 static NAN_METHOD(deviceConstructor) {

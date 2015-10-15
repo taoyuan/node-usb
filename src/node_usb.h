@@ -11,6 +11,7 @@
 
 #include <libusb.h>
 #include <v8.h>
+#include <v8-util.h>
 
 #include <node.h>
 #include <node_buffer.h>
@@ -24,10 +25,6 @@ using namespace node;
 //#define DEBUG
 
 Local<Value> libusbException(int errorno);
-
-struct DeviceObject {
-  Nan::Persistent<Object> obj;
-};
 
 struct Device : public Nan::ObjectWrap {
   libusb_device *device;
@@ -47,12 +44,8 @@ struct Device : public Nan::ObjectWrap {
 
   ~Device();
 
-  static void unpin(libusb_device *device);
-
 protected:
-  // static std::map<libusb_device*, WeakCallbackInfo<libusb_device>*> byPtr;
-  // static std::map<libusb_device*, Persistent<Value>*> byPtr;
-  static std::map<libusb_device *, DeviceObject *> byPtr;
+  static StdPersistentValueMap<libusb_device*, v8::Object> byPtr;
 
   Device(libusb_device *d);
 };
