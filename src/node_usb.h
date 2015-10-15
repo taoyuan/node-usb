@@ -21,7 +21,7 @@ using namespace node;
 
 #include "helpers.h"
 
-#define DEBUG
+//#define DEBUG
 
 Local<Value> libusbException(int errorno);
 

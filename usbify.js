@@ -33,8 +33,9 @@ Object.defineProperty(usb.Device.prototype, "speed", {
 
 usb.Device.prototype.timeout = 1000;
 
-usb.Device.prototype.open = function () {
+usb.Device.prototype.open = function (defaultConfig) {
   this.__open();
+  if (defaultConfig === false) return;
   this.interfaces = [];
   var len = this.configDescriptor.interfaces.length;
   for (var i = 0; i < len; i++) {
@@ -134,6 +135,20 @@ usb.Device.prototype.getStringDescriptor = function (desc_index, callback) {
       callback(undefined, buf.toString('utf16le', 2));
     }
   );
+};
+
+usb.Device.prototype.setConfiguration = function(desired, cb) {
+  var self = this;
+  this.__setConfiguration(desired, function(err) {
+    if (!err) {
+      this.interfaces = [];
+      var len = this.configDescriptor.interfaces.length;
+      for (var i=0; i<len; i++) {
+        this.interfaces[i] = new Interface(this, i);
+      }
+    }
+    cb.call(self, err);
+  });
 };
 
 usb.Device.prototype.setAutoDetachKernelDriver = function (enable) {
