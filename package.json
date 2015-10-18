@@ -1,5 +1,5 @@
 {
-  "name": "usbify",
+  "name": "usbio",
   "description": "Library to access USB devices",
   "keywords": [
     "usb",
@@ -28,7 +28,7 @@
   "engines": {
     "node": ">=0.8.x"
   },
-  "main": "./usbify",
+  "main": "./usbio",
   "repository": {
     "type": "git",
     "url": "https://github.com/nonolith/node-usb.git"
@@ -43,9 +43,9 @@
     "nan": "^2.0.9"
   },
   "devDependencies": {
-    "coffee-script": "~1.6.2",
-    "mocha": "~1.8.2",
-    "aws-sdk": "~2.0.0-rc.15"
+    "coffee-script": "~1.10.0",
+    "mocha": "~2.3.3",
+    "aws-sdk": "~2.2.10"
   },
   "license": "MIT"
 }
